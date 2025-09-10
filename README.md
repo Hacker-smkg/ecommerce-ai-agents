@@ -1,6 +1,22 @@
-# E-commerce AI Agents - Multi-Agent System
+# 🤖 E-commerce AI Agents - Multi-Agent System
 
-A comprehensive multi-agent AI system designed to help scale e-commerce businesses through intelligent automation and insights.
+<div align="center">
+
+![Python](https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![n8n](https://img.shields.io/badge/n8n-EA4B71?style=for-the-badge&logo=n8n&logoColor=white)
+![AI](https://img.shields.io/badge/AI-Powered-FF6B6B?style=for-the-badge&logo=openai&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![Stars](https://img.shields.io/github/stars/Hacker-smkg/ecommerce-ai-agents?style=for-the-badge&logo=github)
+![Forks](https://img.shields.io/github/forks/Hacker-smkg/ecommerce-ai-agents?style=for-the-badge&logo=github)
+
+**🚀 A comprehensive multi-agent AI system designed to help scale e-commerce businesses through intelligent automation and insights.**
+
+[🎯 Live Demo](https://github.com/Hacker-smkg/ecommerce-ai-agents) • [📚 Documentation](#-quick-start) • [🤝 Contributing](#-development)
+
+</div>
+
+---
 
 ## 🏗️ Architecture
 
