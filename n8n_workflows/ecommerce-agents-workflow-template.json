@@ -1,0 +1,189 @@
+{
+  "name": "E-commerce AI Agents Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Daily Analysis Trigger",
+      "type": "@n8n/n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook/shopify",
+        "responseMode": "responseNode"
+      },
+      "id": "shopify-webhook",
+      "name": "Shopify Webhook",
+      "type": "@n8n/n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 500]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/agents/analytics",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "{\n  \"action\": \"daily_analysis\",\n  \"data\": \"{{ $json }}\"\n}",
+        "options": {}
+      },
+      "id": "analytics-agent",
+      "name": "Analytics Agent",
+      "type": "@n8n/n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/agents/operations",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "{\n  \"action\": \"inventory_optimization\",\n  \"analytics_data\": \"{{ $json }}\"\n}",
+        "options": {}
+      },
+      "id": "operations-agent",
+      "name": "Operations Agent", 
+      "type": "@n8n/n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [800, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/agents/marketing",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "{\n  \"action\": \"campaign_optimization\",\n  \"operations_data\": \"{{ $json }}\"\n}",
+        "options": {}
+      },
+      "id": "marketing-agent",
+      "name": "Marketing Agent",
+      "type": "@n8n/n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/agents/strategy",
+        "sendBody": true,
+        "bodyContentType": "json", 
+        "jsonBody": "{\n  \"action\": \"growth_strategy\",\n  \"marketing_data\": \"{{ $json }}\"\n}",
+        "options": {}
+      },
+      "id": "strategy-agent",
+      "name": "Strategy Agent",
+      "type": "@n8n/n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1400, 300]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "resource": "contact",
+        "email": "your-email@example.com",
+        "additionalFields": {
+          "customFieldsUi": {
+            "customFieldsValues": [
+              {
+                "fieldName": "Daily_Report",
+                "value": "{{ $json.report }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "send-report",
+      "name": "Send Daily Report",
+      "type": "@n8n/n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1700, 300]
+    }
+  ],
+  "connections": {
+    "Daily Analysis Trigger": {
+      "main": [
+        [
+          {
+            "node": "Analytics Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shopify Webhook": {
+      "main": [
+        [
+          {
+            "node": "Analytics Agent", 
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analytics Agent": {
+      "main": [
+        [
+          {
+            "node": "Operations Agent",
+            "type": "main", 
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Operations Agent": {
+      "main": [
+        [
+          {
+            "node": "Marketing Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marketing Agent": {
+      "main": [
+        [
+          {
+            "node": "Strategy Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Strategy Agent": {
+      "main": [
+        [
+          {
+            "node": "Send Daily Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 2,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
