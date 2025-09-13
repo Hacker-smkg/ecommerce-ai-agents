@@ -21,7 +21,7 @@ facebook-business==17.0.0
 # Database and Storage
 sqlalchemy==2.0.19
 psycopg2-binary==2.9.7
-pymongo==4.4.1
+pymongo==4.6.3
 
 # Environment and Configuration
 python-dotenv==1.0.0
