@@ -13,7 +13,7 @@ matplotlib==3.7.1
 seaborn==0.12.2
 
 # API and Web Integration
-requests==2.31.0
+requests==2.33.0
 shopify-python-api==12.0.0
 google-analytics-reporting==1.0.0
 facebook-business==17.0.0
