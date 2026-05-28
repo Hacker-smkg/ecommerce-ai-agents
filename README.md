@@ -1,292 +1,134 @@
-# 🤖 E-commerce AI Agents - Multi-Agent System
+# E-commerce AI Agents
+A modular multi-agent backend for ecommerce orchestration with FastAPI, SQLAlchemy persistence, and n8n workflow integration.
 
-<div align="center">
+## What is implemented
+- Modular FastAPI backend under `app/` (no monolithic single-file logic).
+- Four agent services with chained orchestration:
+  - Analytics → Operations → Marketing → Strategy.
+- Persistent run history and report snapshots in SQL database (`DATABASE_URL`, SQLite by default).
+- API key protection for non-health routes (`X-API-Key`, configurable in `.env`).
+- Updated n8n workflow template for JSON payload chaining.
+- Automated test coverage for health, auth, status, pipeline execution, and report generation.
 
-![Python](https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![n8n](https://img.shields.io/badge/n8n-EA4B71?style=for-the-badge&logo=n8n&logoColor=white)
-![AI](https://img.shields.io/badge/AI-Powered-FF6B6B?style=for-the-badge&logo=openai&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
-![Stars](https://img.shields.io/github/stars/Hacker-smkg/ecommerce-ai-agents?style=for-the-badge&logo=github)
-![Forks](https://img.shields.io/github/forks/Hacker-smkg/ecommerce-ai-agents?style=for-the-badge&logo=github)
-
-**🚀 A comprehensive multi-agent AI system designed to help scale e-commerce businesses through intelligent automation and insights.**
-
-[🎯 Live Demo](https://github.com/Hacker-smkg/ecommerce-ai-agents) • [📚 Documentation](#-quick-start) • [🤝 Contributing](#-development)
-
-</div>
-
----
-
-## 🏗️ Architecture
-
-This system uses a **multi-agent architecture** with 4 specialized agents orchestrated through **n8n workflows**:
-
+## Architecture
 ```
-📊 Analytics Agent → ⚙️ Operations Agent → 📢 Marketing Agent → 🎯 Strategy Agent
+Trigger (Cron/Webhook)
+  -> /agents/analytics
+  -> /agents/operations
+  -> /agents/marketing
+  -> /agents/strategy
+  -> /reports/comprehensive
 ```
 
-### Agent Responsibilities
+## Project structure
+```
+ecommerce-ai-agents/
+├── app/
+│   ├── api/
+│   │   ├── deps.py
+│   │   └── routers/
+│   │       ├── agents.py
+│   │       ├── health.py
+│   │       └── reports.py
+│   ├── core/
+│   │   ├── logging.py
+│   │   └── settings.py
+│   ├── db/
+│   │   ├── crud.py
+│   │   ├── models.py
+│   │   └── session.py
+│   ├── schemas/
+│   │   ├── agent.py
+│   │   └── report.py
+│   ├── services/
+│   │   ├── analytics.py
+│   │   ├── operations.py
+│   │   ├── marketing.py
+│   │   ├── strategy.py
+│   │   └── utils.py
+│   └── main.py
+├── api_server.py
+├── n8n_workflows/ecommerce-agents-workflow-template.json
+├── tests/
+├── start_api.sh
+└── start_n8n.sh
+```
 
-1. **📊 Analytics Agent**
-   - Sales trend analysis
-   - Customer behavior insights  
-   - Inventory alerts
-   - Performance metrics
-
-2. **⚙️ Operations Agent**
-   - Inventory optimization
-   - Pricing strategies
-   - Supplier management
-   - Operational efficiency
-
-3. **📢 Marketing Agent**
-   - Campaign creation & optimization
-   - Content generation
-   - Social media strategies
-   - SEO optimization
-
-4. **🎯 Strategy Agent**
-   - Growth opportunities analysis
-   - Market expansion strategies
-   - Competitive intelligence
-   - Long-term planning
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Python 3.8+
-- Node.js 16+
-- npm or yarn
-
-### 1. Install Dependencies
-
+## Quick start
+1) Install dependencies:
 ```bash
-# Install Python dependencies
 pip install -r requirements.txt
-
-# Install n8n globally (already done if you followed setup)
-npm install -g n8n
 ```
 
-### 2. Setup Environment
-
+2) Configure environment:
 ```bash
-# Copy environment template
 cp .env.example .env
-
-# Edit .env file with your API keys
-nano .env
 ```
 
-### 3. Start the System
-
-#### Terminal 1: Start n8n (Visual Workflow Engine)
-```bash
-./start_n8n.sh
-```
-- Open browser to: `http://localhost:5678`
-- Import workflow from: `n8n_workflows/ecommerce-agents-workflow-template.json`
-
-#### Terminal 2: Start API Server (Agent Backend)
+3) Start API server:
 ```bash
 ./start_api.sh
 ```
-- API available at: `http://localhost:8000`
-- API docs at: `http://localhost:8000/docs`
+API docs: `http://localhost:8000/docs`
 
-## 🔄 Workflow Examples
-
-### Daily Business Analysis Workflow
+4) Start n8n in another terminal:
+```bash
+./start_n8n.sh
 ```
-🕒 Cron Trigger (9 AM Daily)
-↓
-📊 Analytics Agent (Sales Analysis)
-↓  
-⚙️ Operations Agent (Inventory Check)
-↓
-📢 Marketing Agent (Campaign Performance)
-↓
-🎯 Strategy Agent (Growth Recommendations)
-↓
-📧 Email Report
-```
+n8n UI: `http://localhost:5678`
 
-### Real-time Order Processing
-```
-🌐 Shopify Webhook (New Order)
-↓
-📊 Analytics Agent (Customer Analysis)
-↓
-📢 Marketing Agent (Upsell Recommendations)  
-↓
-⚙️ Operations Agent (Inventory Update)
-```
+5) In n8n, import:
+- `n8n_workflows/ecommerce-agents-workflow-template.json`
 
-## 🔌 API Endpoints
+## API authentication
+- Health routes are public:
+  - `GET /`
+  - `GET /health`
+- Other routes can require an API key:
+  - Set `REQUIRE_API_KEY=true`
+  - Set `API_KEY=<your_key>`
+  - Send header: `X-API-Key: <your_key>`
 
-### Agent Endpoints
-- `POST /agents/analytics` - Analytics processing
-- `POST /agents/operations` - Operations optimization
-- `POST /agents/marketing` - Marketing campaigns
-- `POST /agents/strategy` - Strategy planning
+## API endpoints
+- `POST /agents/analytics`
+- `POST /agents/operations`
+- `POST /agents/marketing`
+- `POST /agents/strategy`
+- `GET /agents/status`
+- `GET /reports/comprehensive`
 
-### Utility Endpoints
-- `GET /agents/status` - Check agent status
-- `GET /reports/comprehensive` - Full business report
-- `GET /health` - Health check
-
-### Example API Call
+## Example requests
+Analytics:
 ```bash
 curl -X POST "http://localhost:8000/agents/analytics" \
   -H "Content-Type: application/json" \
-  -d '{"action": "daily_analysis", "data": {}}'
+  -d '{
+    "action": "daily_analysis",
+    "data": {
+      "previous_revenue": 10000,
+      "orders": [
+        {"product": "Product A", "amount": 180.5},
+        {"product": "Product B", "amount": 99.9}
+      ],
+      "inventory": [
+        {"name": "Product A", "quantity": 8, "reorder_point": 10},
+        {"name": "Product C", "quantity": 220, "overstock_threshold": 150}
+      ]
+    }
+  }'
 ```
 
-## 📁 Project Structure
-
-```
-ecommerce-ai-agents/
-├── agents/                 # Individual agent implementations
-├── config/                 # Configuration files
-│   └── settings.py        # App settings
-├── tools/                  # Shared tools and utilities
-├── workflows/              # Workflow definitions
-├── n8n_workflows/          # n8n workflow templates
-├── data/                   # Data storage
-├── tests/                  # Test files
-├── api_server.py          # FastAPI backend server
-├── start_n8n.sh          # n8n startup script
-├── start_api.sh          # API server startup script
-├── requirements.txt       # Python dependencies
-├── .env.example          # Environment template
-└── README.md             # This file
-```
-
-## 🎮 Using n8n Visual Workflows
-
-1. **Access n8n**: Open `http://localhost:5678` in your browser
-2. **Import Workflow**: 
-   - Click "+" → Import from File
-   - Select `n8n_workflows/ecommerce-agents-workflow-template.json`
-3. **Customize Workflow**:
-   - Add triggers (webhooks, cron jobs)
-   - Modify agent parameters
-   - Add integrations (Slack, email, databases)
-4. **Execute Workflow**: 
-   - Test with manual triggers
-   - Enable for production use
-
-### n8n Workflow Features
-
-**Triggers Available:**
-- ⏰ Cron Scheduler - Daily/weekly analysis
-- 🌐 Webhooks - Real-time data from Shopify, etc.
-- 📧 Email Triggers - Process email requests
-- 📊 HTTP Requests - External system integration
-
-**Actions Available:**  
-- 📧 Send Emails - Reports and notifications
-- 💬 Slack Messages - Team updates
-- 📊 Google Sheets - Data logging
-- 🗄️ Database Updates - Store insights
-
-## 🔗 Integration Options
-
-### E-commerce Platforms
-- **Shopify**: Product data, orders, customers
-- **WooCommerce**: WordPress integration
-- **Amazon**: Marketplace data
-- **BigCommerce**: Enterprise features
-
-### Marketing Platforms  
-- **Facebook Ads**: Campaign optimization
-- **Google Ads**: Keyword and bid management
-- **Mailchimp**: Email marketing
-- **HubSpot**: CRM integration
-
-### Analytics Platforms
-- **Google Analytics**: Website traffic
-- **Mixpanel**: User behavior
-- **Amplitude**: Product analytics
-
-## 💡 Customization
-
-### Adding New Agents
-1. Create new endpoint in `api_server.py`
-2. Add agent to n8n workflow  
-3. Define agent logic and integrations
-4. Update workflow connections
-
-### Custom Workflows
-1. Design workflow in n8n visual editor
-2. Connect to agent endpoints
-3. Add custom triggers and actions
-4. Test and deploy
-
-## 📊 Monitoring & Reporting
-
-### Built-in Reports
-- Daily business summary
-- Agent performance metrics
-- Workflow execution logs
-- Integration status
-
-### Custom Dashboards
-- Connect to BI tools (Tableau, PowerBI)
-- Export data to Google Sheets
-- Real-time Slack notifications
-
-## 🔧 Development
-
-### Running Tests
+Comprehensive report:
 ```bash
-pytest tests/
+curl "http://localhost:8000/reports/comprehensive"
 ```
 
-### Code Formatting
+## Tests
+Run:
 ```bash
-black .
-flake8 .
+pytest
 ```
 
-### Adding Dependencies
-```bash
-pip install new-package
-pip freeze > requirements.txt
-```
-
-## 🚀 Production Deployment
-
-### Environment Setup
-- Set production environment variables
-- Configure database connections
-- Set up monitoring and logging
-
-### Scaling Options
-- Deploy API server with Docker
-- Use managed n8n hosting
-- Implement load balancing
-- Add Redis for caching
-
-## 📝 Next Steps
-
-1. **Test the System**: Run both servers and test the workflow
-2. **Add Real Integrations**: Connect to your Shopify store, analytics
-3. **Customize Agents**: Modify agent logic for your business needs
-4. **Expand Workflows**: Create specialized workflows for different scenarios
-5. **Add Monitoring**: Implement logging and alerting
-6. **Scale Up**: Move to production infrastructure
-
-## 🆘 Support
-
-- Check API documentation at `http://localhost:8000/docs`
-- Review n8n workflow execution logs
-- Monitor agent responses and errors
-- Test individual endpoints before full workflow
-
----
-
-**Happy Scaling! 🚀**
-
-Your multi-agent e-commerce system is ready to help grow your business through intelligent automation and insights.
+## Notes
+- The backend currently implements deterministic, data-driven agent logic with persistence and orchestration hooks.
+- External platform integrations (Shopify, GA, ads) are prepared via config placeholders and can be extended in service modules.

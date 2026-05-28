@@ -1,5 +1,5 @@
 {
-  "name": "E-commerce AI Agents Workflow",
+  "name": "E-commerce AI Agents Workflow v2",
   "nodes": [
     {
       "parameters": {
@@ -16,97 +16,118 @@
       "name": "Daily Analysis Trigger",
       "type": "@n8n/n8n-nodes-base.cron",
       "typeVersion": 1,
-      "position": [200, 300]
+      "position": [
+        220,
+        260
+      ]
     },
     {
       "parameters": {
         "httpMethod": "POST",
         "path": "webhook/shopify",
-        "responseMode": "responseNode"
+        "responseMode": "lastNode"
       },
       "id": "shopify-webhook",
       "name": "Shopify Webhook",
       "type": "@n8n/n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [200, 500]
+      "position": [
+        220,
+        420
+      ]
     },
     {
       "parameters": {
         "url": "http://localhost:8000/agents/analytics",
         "sendBody": true,
         "bodyContentType": "json",
-        "jsonBody": "{\n  \"action\": \"daily_analysis\",\n  \"data\": \"{{ $json }}\"\n}",
+        "jsonBody": "={\n  \"action\": \"daily_analysis\",\n  \"data\": $json\n}",
         "options": {}
       },
       "id": "analytics-agent",
       "name": "Analytics Agent",
       "type": "@n8n/n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [500, 300]
+      "position": [
+        520,
+        320
+      ]
     },
     {
       "parameters": {
         "url": "http://localhost:8000/agents/operations",
         "sendBody": true,
         "bodyContentType": "json",
-        "jsonBody": "{\n  \"action\": \"inventory_optimization\",\n  \"analytics_data\": \"{{ $json }}\"\n}",
+        "jsonBody": "={\n  \"action\": \"inventory_optimization\",\n  \"analytics_data\": ($json.data ?? $json)\n}",
         "options": {}
       },
       "id": "operations-agent",
-      "name": "Operations Agent", 
+      "name": "Operations Agent",
       "type": "@n8n/n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [800, 300]
+      "position": [
+        820,
+        320
+      ]
     },
     {
       "parameters": {
         "url": "http://localhost:8000/agents/marketing",
         "sendBody": true,
         "bodyContentType": "json",
-        "jsonBody": "{\n  \"action\": \"campaign_optimization\",\n  \"operations_data\": \"{{ $json }}\"\n}",
+        "jsonBody": "={\n  \"action\": \"campaign_optimization\",\n  \"operations_data\": ($json.data ?? $json)\n}",
         "options": {}
       },
       "id": "marketing-agent",
       "name": "Marketing Agent",
       "type": "@n8n/n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1100, 300]
+      "position": [
+        1120,
+        320
+      ]
     },
     {
       "parameters": {
         "url": "http://localhost:8000/agents/strategy",
         "sendBody": true,
-        "bodyContentType": "json", 
-        "jsonBody": "{\n  \"action\": \"growth_strategy\",\n  \"marketing_data\": \"{{ $json }}\"\n}",
+        "bodyContentType": "json",
+        "jsonBody": "={\n  \"action\": \"growth_strategy\",\n  \"marketing_data\": ($json.data ?? $json)\n}",
         "options": {}
       },
       "id": "strategy-agent",
       "name": "Strategy Agent",
       "type": "@n8n/n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1400, 300]
+      "position": [
+        1420,
+        320
+      ]
     },
     {
       "parameters": {
-        "operation": "create",
-        "resource": "contact",
-        "email": "your-email@example.com",
-        "additionalFields": {
-          "customFieldsUi": {
-            "customFieldsValues": [
-              {
-                "fieldName": "Daily_Report",
-                "value": "{{ $json.report }}"
-              }
-            ]
-          }
-        }
+        "url": "http://localhost:8000/reports/comprehensive",
+        "options": {}
       },
-      "id": "send-report",
-      "name": "Send Daily Report",
-      "type": "@n8n/n8n-nodes-base.emailSend",
-      "typeVersion": 2,
-      "position": [1700, 300]
+      "id": "comprehensive-report",
+      "name": "Fetch Comprehensive Report",
+      "type": "@n8n/n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1720,
+        320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "workflow-end",
+      "name": "Workflow End",
+      "type": "@n8n/n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1960,
+        320
+      ]
     }
   ],
   "connections": {
@@ -125,7 +146,7 @@
       "main": [
         [
           {
-            "node": "Analytics Agent", 
+            "node": "Analytics Agent",
             "type": "main",
             "index": 0
           }
@@ -137,7 +158,7 @@
         [
           {
             "node": "Operations Agent",
-            "type": "main", 
+            "type": "main",
             "index": 0
           }
         ]
@@ -169,7 +190,18 @@
       "main": [
         [
           {
-            "node": "Send Daily Report",
+            "node": "Fetch Comprehensive Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Comprehensive Report": {
+      "main": [
+        [
+          {
+            "node": "Workflow End",
             "type": "main",
             "index": 0
           }
@@ -182,8 +214,13 @@
     "executionOrder": "v1"
   },
   "staticData": null,
-  "tags": [],
-  "triggerCount": 2,
-  "updatedAt": "2024-01-01T00:00:00.000Z",
-  "versionId": "1"
+  "tags": [
+    {
+      "name": "ecommerce"
+    },
+    {
+      "name": "ai-agents"
+    }
+  ],
+  "versionId": "2"
 }
